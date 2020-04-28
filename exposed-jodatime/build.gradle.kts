@@ -20,7 +20,7 @@ dependencies {
     testImplementation(kotlin("test-junit"))
 
     testImplementation("com.opentable.components", "otj-pg-embedded", "0.12.0")
-    testImplementation("mysql", "mysql-connector-mxj", "5.0.12")
+    testImplementation("ch.vorburger.mariaDB4j:mariaDB4j:2.4.0")
     testImplementation("org.xerial", "sqlite-jdbc", "3.23.1")
     testImplementation("com.h2database", "h2", "1.4.199")
 

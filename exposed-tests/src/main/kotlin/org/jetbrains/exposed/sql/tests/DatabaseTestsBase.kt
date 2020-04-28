@@ -1,13 +1,13 @@
 package org.jetbrains.exposed.sql.tests
 
-import com.mysql.management.MysqldResource
-import com.mysql.management.driverlaunched.MysqldResourceNotFoundException
-import com.mysql.management.driverlaunched.ServerLauncherSocketFactory
-import com.mysql.management.util.Files
+import ch.vorburger.mariadb4j.DB
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import org.h2.engine.Mode
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.exposedLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.transactions.transactionManager
 import java.sql.Connection
@@ -24,21 +24,25 @@ enum class TestDB(val connection: () -> String, val driver: String, val user: St
     MYSQL({
             val host = System.getProperty("exposed.test.mysql.host") ?: System.getProperty("exposed.test.mysql8.host")
             val port = System.getProperty("exposed.test.mysql.port") ?: System.getProperty("exposed.test.mysql8.port")
-            host?.let { dockerHost ->
-                "jdbc:mysql://$dockerHost:$port/testdb?useSSL=false"
-            } ?: "jdbc:mysql:mxj://localhost:12345/testdb1?createDatabaseIfNotExist=true&characterEncoding=UTF-8&server.initialize-user=false&user=root&password="
+            if (host != null)
+                "jdbc:mysql://$host:$port/testdb?useSSL=false"
+            else {
+                 DB.newEmbeddedDB(3306)
+
+                "jdbc:mysql://localhost:3306/testdb1?createDatabaseIfNotExist=true&characterEncoding=UTF-8&server.initialize-user=false&user=root&password="
+            }
         },
         driver = "com.mysql.jdbc.Driver",
-        beforeConnection = { System.setProperty(Files.USE_TEST_DIR, java.lang.Boolean.TRUE!!.toString()); Files().cleanTestDir(); Unit },
+//        beforeConnection = { System.setProperty(Files.USE_TEST_DIR, java.la//ng.Boolean.TRUE!!.toString()); Files().cleanTestDir(); Unit },
         afterTestFinished = {
-            try {
+/*            try {
                 val baseDir = com.mysql.management.util.Files().tmp(MysqldResource.MYSQL_C_MXJ)
                 ServerLauncherSocketFactory.shutdown(baseDir, null)
             } catch (e: MysqldResourceNotFoundException) {
                 exposedLogger.warn(e.message, e)
             } finally {
                 Files().cleanTestDir()
-            }
+            }*/
         }),
     POSTGRESQL({"jdbc:postgresql://localhost:12346/template1?user=postgres&password=&lc_messages=en_US.UTF-8"}, "org.postgresql.Driver",
             beforeConnection = { postgresSQLProcess }, afterTestFinished = { postgresSQLProcess.close() }),
