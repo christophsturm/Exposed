@@ -132,6 +132,7 @@ class Database private constructor(private val resolvedVendor: String? = null, v
             url.startsWith("jdbc:postgresql") -> PostgreSQLDialect.dialectName
             url.startsWith("jdbc:pgsql") -> PostgreSQLNGDialect.dialectName
             url.startsWith("jdbc:mysql") -> MysqlDialect.dialectName
+            url.startsWith("jdbc:tc:mysql") -> MysqlDialect.dialectName
             url.startsWith("jdbc:mariadb") -> MariaDBDialect.dialectName
             url.startsWith("jdbc:oracle") -> OracleDialect.dialectName
             url.startsWith("jdbc:sqlite") -> SQLiteDialect.dialectName

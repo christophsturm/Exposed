@@ -29,13 +29,7 @@ enum class TestDB(
         if (host != null)
             "jdbc:mysql://$host:$port/testdb?useSSL=false"
         else {
-            val container: MySQLContainer<Nothing> = MySQLContainer<Nothing>().apply {
-                withDatabaseName("testdb1")
-                withUsername("root")
-                start()
-            }
-
-            container.jdbcUrl
+            "jdbc:tc:mysql:5.6.23:///databasename"
         }
     },
         driver = "com.mysql.jdbc.Driver",
@@ -105,7 +99,7 @@ enum class TestDB(
 
     companion object {
         fun enabledInTests(): List<TestDB> {
-            val embeddedTests = (TestDB.values().toList() - ORACLE - SQLSERVER - MARIADB).joinToString()
+            val embeddedTests = (values().toList() - ORACLE - SQLSERVER - MARIADB).joinToString()
             val concreteDialects = System.getProperty("exposed.test.dialects", embeddedTests).let {
                 if (it == "") emptyList()
                 else it.split(',').map { it.trim().toUpperCase() }
